@@ -1,0 +1,7 @@
+<h1>Register</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}  <!-- This will render email and address fields automatically -->
+    <button type="submit">Register</button>
+</form>
+<a href="{% url 'login' %}">Already have an account? Login</a>

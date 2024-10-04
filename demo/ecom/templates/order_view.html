@@ -1,0 +1,70 @@
+<h1>Place Order</h1>
+
+<p>Welcome, {{ user_profile.user.username }}!</p>
+<p>Address: {{ user_profile.address }}</p>
+
+<form method="post" id="order-form">
+    {% csrf_token %}
+    <div id="order-items">
+        <div class="order-item">
+            <select name="item">
+                <option value="">Select Item</option>
+                {% for item in items %}
+                <option value="{{ item.id }}">{{ item.name }}</option>
+                {% endfor %}
+            </select>
+            <input type="number" name="quantity" min="1" placeholder="Quantity" required>
+        </div>
+    </div>
+    <button type="button" onclick="addItem()">Add One More Item</button>
+    <br><br>
+    <button type="submit">Place Order</button>
+</form>
+
+<h2>Your Orders</h2>
+<table>
+    <tr>
+        <th>Order ID</th>
+        <th>Order Created Date</th>
+        <th>Items</th>
+        <th>Total Price</th>
+    </tr>
+    {% for order in orders %}
+    <tr>
+        <td>{{ order.id }}</td>
+        <td>{{ order.order_created_date }}</td>
+        <td>
+            <ul>
+                {% for order_item in order.orderitem_set.all %}
+                    <li>{{ order_item.item.name }} - ${{ order_item.item.price }} (Quantity: {{ order_item.quantity }})</li>
+                {% endfor %}
+            </ul>
+        </td>
+        <td>${{ order.total_price }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<!-- Logout Button -->
+<form action="{% url 'logout' %}" method="post" style="display:inline;">
+    {% csrf_token %}
+    <button type="submit">Logout</button>
+</form>
+
+<script>
+    function addItem() {
+        const orderItemsDiv = document.getElementById('order-items');
+        const newOrderItemDiv = document.createElement('div');
+        newOrderItemDiv.classList.add('order-item');
+        newOrderItemDiv.innerHTML = `
+            <select name="item">
+                <option value="">Select Item</option>
+                {% for item in items %}
+                <option value="{{ item.id }}">{{ item.name }}</option>
+                {% endfor %}
+            </select>
+            <input type="number" name="quantity" min="1" placeholder="Quantity" required>
+        `;
+        orderItemsDiv.appendChild(newOrderItemDiv);
+    }
+</script>

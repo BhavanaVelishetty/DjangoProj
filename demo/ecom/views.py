@@ -53,10 +53,20 @@ def order_view(request):
 
         # Create an order
         order = Order.objects.create(user=request.user)
-        
+
         for item_id, quantity in zip(items, quantities):
             item = Item.objects.get(id=item_id)
-            OrderItem.objects.create(order=order, item=item, quantity=quantity)
+            #OrderItem.objects.create(order=order, item=item, quantity=quantity)
+            # Check if the item already exists in the order
+            order_item, created = OrderItem.objects.get_or_create(order=order, item=item)
+
+            # If it exists, update the quantity
+            if not created:
+                order_item.quantity += int(quantity)  # Increment quantity
+                order_item.save()  # Save the updated quantity
+            else:
+                order_item.quantity = int(quantity)  # Set quantity if newly created
+                order_item.save()  # Save the new order item
 
         return redirect('order_view')  # Redirect to see the updated order summary
 
